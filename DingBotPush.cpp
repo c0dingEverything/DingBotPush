@@ -15,29 +15,41 @@ int main()
 
 	if (configJson != NULL)
 	{
-		if (!configJson.contains("accessToken")) {
-			fprintf(stderr, "accessToken不存在");
+		if (configJson.empty()) {
+			fprintf(stderr, "配置文件为空");
 			return -1;
 		}
-		auto token = (string)configJson.at("accessToken");
-		int len = strlen( token.c_str()) + 1;
-		char* accessToken = (char *)malloc(len);
-		memset(accessToken, 0, len);
-		strcpy_s(accessToken, len, token.c_str());
+		if (!configJson.contains("url")) {
+			fprintf(stderr, "url不存在");
+			return -1;
+		}
 
-		char url[1024];
-		sprintf_s(url, "https://oapi.dingtalk.com/robot/send?access_token=%s", accessToken);
-		//   strcpy(url, "http://127.0.0.1:8080");
-		free(accessToken);
-		if (!configJson.contains("messages")) {
-			fprintf(stderr, "messages不存在");
-			return -1;
+		string url = (string)configJson.at("url");
+		
+		if (url.find("?") == url.npos && url[strlen(url.c_str()) - 1] != '?') {
+			url.append("?");
 		}
-		auto messages = configJson.at("messages");
-		size_t size = messages.size();
-		for (int i = 0; i < size; i++) {
-			string body = messages.at(i).dump();
-			postJson(url, &body);
+
+		string param;
+		auto jsonParam = configJson.at("param");
+		for (json::iterator it = jsonParam.begin(); it != jsonParam.end(); ++it) {
+			param.append(it.key().c_str()).append("=");
+			if (it.value().is_string()) {
+				param.append(escapeURL(it.value()));
+			}else{
+				param.append(::to_string((int)it.value()));
+			}
+			param.append("&");
+		}
+
+		vector<string> toIds = configJson.at("to_id");
+		for (int i = 0; i < toIds.size(); i++) {
+			string toId = toIds[i];
+			string tempParam = param;
+			string tempUrl = url;
+			tempParam.append("to_id=").append(toId);
+			string empty = "";
+			postJson(tempUrl.append(tempParam).c_str(), &empty);
 		}
 	}
 	else

@@ -1,0 +1,13 @@
+{
+  "url": "http://ilink.szlanyou.com/ilinkGW/ilink-open/api/msg/sendMsgByRobotAccid",
+  "to_id": [ "4627006691", "4627006691" ],
+  "param": {
+    "app_key": "ROBOTER",
+    "app_secret": "7bf4c891aff711ecb5c400505688a6d9",
+    "from_id": "app_devops_robot",
+    "to_type": 1,
+    "msg_class": 1,
+    "msg_title": "日报填写提醒",
+    "msg_content": "请于当天完成日报填写，谢谢"
+  }
+}
